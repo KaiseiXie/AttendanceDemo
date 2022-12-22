@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mvc
+    username: username
+    password: 33333333
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mvc:
+  pathmatch:
+    matching-strategy:ant_path_matcher
+
+mybatis:
+ mapper-location: classpath*:mybatis/mapper/*Mappers.xml
