@@ -1,8 +1,15 @@
 package com.example.attendancedemo.core.domain;
 
+import jdk.jfr.DataAmount;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
+
 import java.util.Arrays;
 import java.util.Date;
+import lombok.Data;
 
+@Data
 public class Employee {
 
     private String name;
@@ -13,45 +20,4 @@ public class Employee {
 
     private Date[] offdutytime;
 
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                ", ondutytime=" + Arrays.toString(ondutytime) +
-                ", offdutytime=" + Arrays.toString(offdutytime) +
-                '}';
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Date[] getOndutytime() {
-        return ondutytime;
-    }
-
-    public void setOndutytime(Date[] ondutytime) {
-        this.ondutytime = ondutytime;
-    }
-
-    public Date[] getOffdutytime() {
-        return offdutytime;
-    }
-
-    public void setOffdutytime(Date[] offdutytime) {
-        this.offdutytime = offdutytime;
-    }
 }

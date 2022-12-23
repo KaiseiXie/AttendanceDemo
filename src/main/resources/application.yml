@@ -9,5 +9,5 @@ mvc:
   pathmatch:
     matching-strategy:ant_path_matcher
 
-mybatis:
- mapper-location: classpath*:mybatis/mapper/*Mappers.xml
+#mybatis:
+# mapper-location: classpath*:mybatis/mapper/*Mappers.xml
