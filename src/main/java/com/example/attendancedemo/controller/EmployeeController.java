@@ -3,6 +3,7 @@ package com.example.attendancedemo.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.attendancedemo.common.R;
+import com.example.attendancedemo.entity.Attendance;
 import com.example.attendancedemo.entity.Employee;
 import com.example.attendancedemo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class EmployeeController {
             return R.error("登陆失败");
         }
         //4.如果查询到则进行比对，比对成功则把数据存入session，比对失败则返回失败结果
-        if (password == employeeService.getById(1).getPassword()){
+        if (password.equals(emp.getPassword())){
             request.getSession().setAttribute("employee",employee);
             return R.success(employee);
         } return R.error("密码错误，登录失败");
@@ -62,6 +63,8 @@ public class EmployeeController {
     @PostMapping
     public R<String> save(@RequestBody Employee employee){
         log.info("社員{}を追加",employee.toString());
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+
         employeeService.save(employee);
         return R.success("追加しました");
     }
@@ -105,5 +108,14 @@ public class EmployeeController {
     public R<String> delete(){
         return  null;
     }
+
+    @PostMapping("/attendance")
+    public R<String> clockIn(HttpServletRequest Request,@RequestBody Attendance attendance){
+
+
+
+        return null;
+    }
+
 
 }

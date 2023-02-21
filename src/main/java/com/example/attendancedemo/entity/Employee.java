@@ -18,9 +18,6 @@ public class Employee implements Serializable {
     //社員id
     private Long id;
 
-    //勤怠時間
-    private WorkTime workTime;
-
     //性別
     private String sex;
 
