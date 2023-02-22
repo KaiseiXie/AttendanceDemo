@@ -1,10 +1,12 @@
 package com.example.attendancedemo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.attendancedemo.common.R;
 import com.example.attendancedemo.entity.Attendance;
 import com.example.attendancedemo.entity.Employee;
+import com.example.attendancedemo.service.AttendanceService;
 import com.example.attendancedemo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -25,6 +30,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private AttendanceService attendanceService;
 
     /**
      * 实现员工登录功能
@@ -50,8 +58,8 @@ public class EmployeeController {
         }
         //4.如果查询到则进行比对，比对成功则把数据存入session，比对失败则返回失败结果
         if (password.equals(emp.getPassword())){
-            request.getSession().setAttribute("employee",employee);
-            return R.success(employee);
+            request.getSession().setAttribute("employee",emp.getId());
+            return R.success(emp);
         } return R.error("密码错误，登录失败");
     }
 
@@ -109,13 +117,78 @@ public class EmployeeController {
         return  null;
     }
 
-    @PostMapping("/attendance")
-    public R<String> clockIn(HttpServletRequest Request,@RequestBody Attendance attendance){
+    /**
+     * 实现员工上班打卡功能
+     * @param request
+     * @return
+     */
+    @PostMapping("/clockin")
+    public String clockIn(HttpServletRequest request){
+
+        //获取打卡用户id并输出到控制台
+        String employeeId = request.getSession().getAttribute("employee").toString();
+        log.info("当前打卡用户id为={}",employeeId);
+
+        //通过打卡用户id从员工表中获取打卡员工对象
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(!employeeId.isEmpty(),Employee::getId,employeeId);
+        Employee emp = employeeService.getOne(queryWrapper);
+
+        LambdaUpdateWrapper<Employee> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.
+        //通过查询数据库判断当前员工工作状态
+            //如果不在工作状态，则新建一个打卡对象传入数据库，并把工作状态传入session，并返回打卡成功结果
+        if (employeeService.update()) {
+
+            emp.setWorkStatus(1);
+
+            Attendance atd = new Attendance();
+            atd.setId(emp.getId());
+            atd.setName(emp.getName());
+            atd.setUsername(emp.getUsername());
+            atd.setClockInTime(LocalDateTime.now());
+            Date date =new Date();
+            atd.setTimes(date.getTime());
+
+            attendanceService.save(atd);
+
+        }else{
+            //如果在工作状态，则提示错误信息
+            return "clocktimefail";
+        }
 
 
 
-        return null;
+
+
+        return "clocktime";
     }
+
+   /*
+    @PostMapping("/clockout")
+    public String clockOut(HttpServletRequest request){
+
+        //获取打卡用户id并输出到控制台
+        String employeeId = request.getSession().getAttribute("employee").toString();
+        log.info("当前打卡用户id为={}",employeeId);
+
+        //通过打卡用户id从员工表中获取打卡员工对象
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(!employeeId.isEmpty(),Employee::getId,employeeId);
+        Employee emp = employeeService.getOne(queryWrapper);
+
+        //获取当前时间并连同员工信息一同存入数据库
+        Attendance atd = new Attendance();
+        atd.setId(emp.getId());
+        atd.setName(emp.getName());
+        atd.setUsername(emp.getUsername());
+        atd.setClockOutTime(LocalDateTime.now());
+        log.info("得到下班打卡对象{}", atd);
+        //attendanceService.save(atd);
+
+        //返回打卡成功结果
+        return "clocktime";
+    }*/
 
 
 }

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>出勤時間登録</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+</head>
+<body>
+    <button id="clockInButton" class="divSave">出勤ボタン</button>
+    <br><br><br>
+    <button id="clockOutButton" class="divSave">退勤ボタン</button>
+
+    <script>
+        $(function() {
+            $('#clockInButton').click(function() {
+                $.ajax({
+                    url: '/employee/clockin', // 发送请求的地址
+                    type: 'POST', // 请求方式
+                    success: function(data) { // 请求成功的回调函数
+                        alert('上班打卡成功！');
+                    },
+                    error: function() { // 请求失败的回调函数
+                        alert('下班打卡失败！');
+                    }
+                });
+            });
+        });
+        $(function() {
+            $('#clockOutButton').click(function() {
+                $.ajax({
+                    url: '/employee/clockout', // 发送请求的地址
+                    type: 'POST', // 请求方式
+                    success: function(data) { // 请求成功的回调函数
+                        alert('下班打卡成功！');
+                    },
+                    error: function() { // 请求失败的回调函数
+                        alert('下班打卡失败！');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
