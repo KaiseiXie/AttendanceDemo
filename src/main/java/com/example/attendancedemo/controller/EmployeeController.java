@@ -1,5 +1,6 @@
 package com.example.attendancedemo.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -130,17 +131,19 @@ public class EmployeeController {
         log.info("当前打卡用户id为={}",employeeId);
 
         //通过打卡用户id从员工表中获取打卡员工对象
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
         queryWrapper.eq(!employeeId.isEmpty(),Employee::getId,employeeId);
         Employee emp = employeeService.getOne(queryWrapper);
 
-        LambdaUpdateWrapper<Employee> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.
-        //通过查询数据库判断当前员工工作状态
-            //如果不在工作状态，则新建一个打卡对象传入数据库，并把工作状态传入session，并返回打卡成功结果
-        if (employeeService.update()) {
 
-            emp.setWorkStatus(1);
+        //通过查询数据库判断当前员工工作状态
+            //如果不在工作状态，则新建一个打卡对象传入数据库，把本次记录标识传入session，并返回打卡成功结果
+        if (emp.getWorkStatus() == 0) {
+
+            LambdaUpdateWrapper<Employee> updateWrapper = new LambdaUpdateWrapper();
+            updateWrapper.eq(Employee::getId,emp.getId());
+            updateWrapper.set(Employee::getWorkStatus,1);
+            employeeService.update(updateWrapper);
 
             Attendance atd = new Attendance();
             atd.setId(emp.getId());
@@ -152,17 +155,53 @@ public class EmployeeController {
 
             attendanceService.save(atd);
 
+            request.getSession().setAttribute("attendance",atd.getTimes());
+
         }else{
             //如果在工作状态，则提示错误信息
-            return "clocktimefail";
+
         }
-
-
-
-
 
         return "clocktime";
     }
+
+    /**
+     * 实现退勤功能
+     * @param request
+     * @return
+     */
+    @PostMapping("/clockout")
+    public String clockOut(HttpServletRequest request){
+        //获取退勤打卡用户id并输出到控制台
+        String employeeId = request.getSession().getAttribute("employee").toString();
+        log.info("当前退勤打卡用户id为={}",employeeId);
+
+        //根据id查询当前员工工作状态
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(!employeeId.isEmpty(),Employee::getId,employeeId);
+        Employee emp = employeeService.getOne(queryWrapper);
+
+        //如果处于工作状态则记录下班时刻，并将工作状态改为非工作状态
+        if (emp.getWorkStatus() == 1){
+            LambdaUpdateWrapper<Employee> updateWrapper = new LambdaUpdateWrapper();
+            updateWrapper.eq(Employee::getId,emp.getId());
+            updateWrapper.set(Employee::getWorkStatus,0);
+            employeeService.update(updateWrapper);
+
+        //通过times找到attendance表中对应记录，并更新记录,且删除session中的该次考勤记录标识
+            LambdaUpdateWrapper<Attendance> updateWrapper1 = new LambdaUpdateWrapper();
+            updateWrapper1.eq(Attendance::getTimes,request.getSession().getAttribute("attendance"));
+            updateWrapper1.set(Attendance::getClockOutTime,LocalDateTime.now());
+            attendanceService.update(updateWrapper1);
+            request.getSession().removeAttribute("attendance");
+        }
+
+            //如果处于非工作状态，则返回错误信息
+
+        return null;
+    }
+
+
 
    /*
     @PostMapping("/clockout")
