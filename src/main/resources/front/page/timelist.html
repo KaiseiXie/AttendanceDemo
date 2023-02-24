@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no,minimal-ui">
+        <title>出退勤時間</title>
+        <link rel="icon" href="./../images/favico.ico">
+        <!--不同屏幕尺寸根字体设置-->
+        <script src="./../js/base.js"></script>
+        <!--element-ui的样式-->
+        <link rel="stylesheet" href="../../backend/plugins/element-ui/index.css" />
+        <!--引入vant样式-->
+        <link rel="stylesheet" href="../styles/vant.min.css"/>
+        <!-- 引入样式  -->
+        <link rel="stylesheet" href="../styles/index.css" />
+        <!--本页面内容的样式-->
+        <link rel="stylesheet" href="./../styles/clocktime.css" />
+    </head>
+    <body>
+        <div id="clocktime" class="app">
+            <div class="divHead">
+                <div class="divTitle">
+                    <i class="el-icon-arrow-left" @click="goBack"></i>{{title}}
+                </div>
+            </div>
+            <div class="divContent">
+                <div class="divItem" v-for="(item,index) in clockTimeList" :key="index" @click.capture="itemClick(item)">
+                    <div class="divAddress">
+                        <span :class="{spanId:item.label === 'ID',spanName:item.label === '名前',spanClockInTime:item.label === '出勤時間'},spanClockOutTime:item.label === '退勤時間'">{{item.label}}</span>
+                        {{item.detail}}
+                    </div>
+                    <div class="divUserPhone">
+                        <span>{{item.id}}</span>
+                        <span>{{item.name}}</span>
+                        <span>{{item.clockInTime}}</span>
+                        <span>{{item.clockOutTime}}</span>
+                    </div>
+                    <div class="divSplit"></div>
+                </div>
+            </div>
+            <div class="divBottom" @click="clockOutTimes">退勤時間登録ボタン</div>
+        </div>
+        <!-- 开发环境版本,包含了有帮助的命令行警告 -->
+        <script src="../../backend/plugins/vue/vue.js"></script>
+        <!-- 引入组件库 -->
+        <script src="../../backend/plugins/element-ui/index.js"></script>
+        <!-- 引入vant样式 -->
+        <script src="./../js/vant.min.js"></script>
+        <script src="../api/clocktime.js"></script>
+        <!-- 引入axios -->
+        <script src="../../backend/plugins/axios/axios.min.js"></script>
+        <script src="./../js/request.js"></script>
+        <script>
+            new Vue({
+                el:"#clocktime",
+                data(){
+                    return {
+                        clockTimeList:[
+                        ],
+                    }
+                },
+                computed:{},
+                created(){
+                    this.initData()
+                },
+                mounted(){},
+                methods:{
+                    goBack(){
+                        history.go(-1)
+                    },
+                    async initData(){
+                        const res = await clockTimeListApi()
+                        if(res.code === 1){
+                            this.clockTimeList = res.data
+                        }else{
+                            this.$message.error(res.msg)
+                        }
+                    },
+                    async clockOutTimes(){
+                        let res= {}
+                        if(true){
+                            res = await updateClockTimeApi()
+                        }
+
+                        if(res.code === 1){
+                            window.requestAnimationFrame(()=>{
+                                window.location.replace('/front/page/clocktime.html')
+                            })
+                        }else{
+                            this.$notify({ type:'warning', message:res.msg});
+                        }
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

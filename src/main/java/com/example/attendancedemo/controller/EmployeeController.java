@@ -124,7 +124,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/clockin")
-    public String clockIn(HttpServletRequest request){
+    public R<Attendance> clockIn(HttpServletRequest request){
 
         //获取打卡用户id并输出到控制台
         String employeeId = request.getSession().getAttribute("employee").toString();
@@ -157,12 +157,12 @@ public class EmployeeController {
 
             request.getSession().setAttribute("attendance",atd.getTimes());
 
+            return R.success(atd);
         }else{
             //如果在工作状态，则提示错误信息
-
+            return R.error("打卡失败");
         }
 
-        return "clocktime";
     }
 
     /**
@@ -171,7 +171,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/clockout")
-    public String clockOut(HttpServletRequest request){
+    public R<String> clockOut(HttpServletRequest request){
         //获取退勤打卡用户id并输出到控制台
         String employeeId = request.getSession().getAttribute("employee").toString();
         log.info("当前退勤打卡用户id为={}",employeeId);
@@ -198,36 +198,10 @@ public class EmployeeController {
 
             //如果处于非工作状态，则返回错误信息
 
-        return null;
+        return R.success("退勤成功");
     }
 
 
-
-   /*
-    @PostMapping("/clockout")
-    public String clockOut(HttpServletRequest request){
-
-        //获取打卡用户id并输出到控制台
-        String employeeId = request.getSession().getAttribute("employee").toString();
-        log.info("当前打卡用户id为={}",employeeId);
-
-        //通过打卡用户id从员工表中获取打卡员工对象
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(!employeeId.isEmpty(),Employee::getId,employeeId);
-        Employee emp = employeeService.getOne(queryWrapper);
-
-        //获取当前时间并连同员工信息一同存入数据库
-        Attendance atd = new Attendance();
-        atd.setId(emp.getId());
-        atd.setName(emp.getName());
-        atd.setUsername(emp.getUsername());
-        atd.setClockOutTime(LocalDateTime.now());
-        log.info("得到下班打卡对象{}", atd);
-        //attendanceService.save(atd);
-
-        //返回打卡成功结果
-        return "clocktime";
-    }*/
 
 
 }
