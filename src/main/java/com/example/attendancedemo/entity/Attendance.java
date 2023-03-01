@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 public class Attendance implements Serializable {
@@ -13,15 +12,19 @@ public class Attendance implements Serializable {
 
     private String name;
 
+    //操作者id
     private Long id;
 
     private String username;
 
-    //出勤日期
-    private Long times;
+    //出勤时刻的绝对时间，也可用作出勤编号
+    private Long timesIn;
 
     private LocalDateTime clockInTime;
 
     private LocalDateTime clockOutTime;
+
+    //出勤时间
+    private String workTime;
 
 }

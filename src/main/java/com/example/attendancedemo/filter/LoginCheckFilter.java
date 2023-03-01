@@ -1,6 +1,6 @@
-/*
 package com.example.attendancedemo.filter;
 
+import com.example.attendancedemo.common.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 
@@ -29,6 +29,8 @@ public class LoginCheckFilter implements Filter {
         String[] urls = new String[]{
             "/employee/login",
             "/employee/logout",
+            "/backend/**",
+            "/front/**",
         };
 
         //判断本次请求是否需要处理
@@ -36,15 +38,22 @@ public class LoginCheckFilter implements Filter {
 
         //如果不需要处理，直接放行
         if (check){
-            log.info("本次请求不需要处理，直接放行");
+            log.info("本次请求{}不需要处理，直接放行",requestURI);
             chain.doFilter(request,response);
+            return;
         }
         //判断登录状态,如果已登录则放行
         if (req.getSession().getAttribute("employee") != null){
+            log.info("もうサインしました、idは:{}",req.getSession().getAttribute("employee"));
 
+            Long empId = (Long) req.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
+            chain.doFilter(req,res);
+            return;
         }
-            //如果登录则放行
-            //如果未登录则返回登录结果，通过输出流方式像客户端页面响应数据
+
+        log.info("サインしない");
     }
 
 
@@ -60,4 +69,5 @@ public class LoginCheckFilter implements Filter {
         return false;
     }
 }
-*/
+
+

@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -151,11 +152,11 @@ public class EmployeeController {
             atd.setUsername(emp.getUsername());
             atd.setClockInTime(LocalDateTime.now());
             Date date =new Date();
-            atd.setTimes(date.getTime());
+            atd.setTimesIn(date.getTime());
 
             attendanceService.save(atd);
 
-            request.getSession().setAttribute("attendance",atd.getTimes());
+            request.getSession().setAttribute("attendance",atd.getTimesIn());
 
             return R.success(atd);
         }else{
@@ -188,10 +189,17 @@ public class EmployeeController {
             updateWrapper.set(Employee::getWorkStatus,0);
             employeeService.update(updateWrapper);
 
-        //通过times找到attendance表中对应记录，并更新记录,且删除session中的该次考勤记录标识
+        //通过times找到attendance表中对应记录，计入退勤时间，计算出工作市场，并更新记录,且删除session中的该次考勤记录标识
             LambdaUpdateWrapper<Attendance> updateWrapper1 = new LambdaUpdateWrapper();
-            updateWrapper1.eq(Attendance::getTimes,request.getSession().getAttribute("attendance"));
+            updateWrapper1.eq(Attendance::getTimesIn,request.getSession().getAttribute("attendance"));
             updateWrapper1.set(Attendance::getClockOutTime,LocalDateTime.now());
+
+            //计算时间间隔
+            Long timesIn = attendanceService.getOne(updateWrapper1).getTimesIn();
+            String workTime = attendanceService.timeCalculator(timesIn);
+            updateWrapper1.set(Attendance::getWorkTime,workTime);
+
+            //更新记录，删除考勤标识
             attendanceService.update(updateWrapper1);
             request.getSession().removeAttribute("attendance");
         }
