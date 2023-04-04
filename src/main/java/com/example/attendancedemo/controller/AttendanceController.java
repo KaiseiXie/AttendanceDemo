@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.attendancedemo.common.R;
 import com.example.attendancedemo.entity.Attendance;
-import com.example.attendancedemo.mapper.AttendanceMapper;
 import com.example.attendancedemo.service.AttendanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

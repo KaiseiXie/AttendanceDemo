@@ -17,7 +17,7 @@ function addressLastUpdateApi() {
 //打卡上班
 function  addClockTimeApi(){
     return $axios({
-        'url': '/employee/clockin',
+        'url': '/user/clockin',
         'method': 'post',
       })
 }
@@ -25,7 +25,7 @@ function  addClockTimeApi(){
 //打卡下班
 function  updateClockTimeApi(){
     return $axios({
-        'url': '/employee/clockout',
+        'url': '/user/clockout',
         'method': 'post',
     })
 }

@@ -30,13 +30,13 @@
                 <span :class="{spanId:item.label === 'ID',spanName:item.label === '名前',spanClockInTime:item.label === '出勤時間'},spanClockOutTime:item.label === '退勤時間'">{{item.label}}</span>
                 {{item.detail}}
             </div>
-            <div class="divUserAddress">
+            <div class="divUserRecord">
                 <span>{{item.id}}</span>
                 <span>{{item.name}}</span>
                 <span>{{item.clockInTime}}</span>
                 <span>{{item.clockOutTime}}</span>
             </div>
-            <div class="divSplit"></div>
+<!--            <div class="divSplit"></div>-->
         </div>
     </div>
     <div class="divBottom" @click="clockOutTimes">退勤時間登録ボタン</div>

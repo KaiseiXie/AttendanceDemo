@@ -29,6 +29,8 @@ public class LoginCheckFilter implements Filter {
         String[] urls = new String[]{
             "/employee/login",
             "/employee/logout",
+            "/user/login",
+            "/user/logout",
             "/backend/**",
             "/front/**",
         };
@@ -44,19 +46,26 @@ public class LoginCheckFilter implements Filter {
         }
         //判断登录状态,如果已登录则放行
         if (req.getSession().getAttribute("employee") != null){
+
             log.info("もうサインしました、idは:{}",req.getSession().getAttribute("employee"));
 
-            Long empId = (Long) req.getSession().getAttribute("employee");
+            Long empId = (Long)req.getSession().getAttribute("employee");
             BaseContext.setCurrentId(empId);
+            chain.doFilter(req,res);
+            return;
+        }
+        if (req.getSession().getAttribute("user")!=null){
 
+            log.info("もうサインしました、idは:{}",req.getSession().getAttribute("user"));
+
+            Long phone = (Long)req.getSession().getAttribute("user");
+            BaseContext.setCurrentId(phone);
             chain.doFilter(req,res);
             return;
         }
 
         log.info("サインしない");
     }
-
-
 
 
     public boolean check(String[] urls,String requestUrl){
